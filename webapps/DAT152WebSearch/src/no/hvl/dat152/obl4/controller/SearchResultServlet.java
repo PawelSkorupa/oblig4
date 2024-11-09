@@ -6,6 +6,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import org.apache.commons.text.StringEscapeUtils;
+
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -30,6 +32,7 @@ public class SearchResultServlet extends HttpServlet {
 			String user = Validator.validString(request.getParameter("user"));
 			String searchkey = Validator.validString(request
 					.getParameter("searchkey"));
+			searchkey = StringEscapeUtils.escapeHtml4(searchkey);
 
 			Timestamp datetime = new Timestamp(new Date().getTime());
 			SearchItem search = new SearchItem(datetime, user, searchkey);
