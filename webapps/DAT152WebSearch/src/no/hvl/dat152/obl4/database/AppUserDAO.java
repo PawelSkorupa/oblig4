@@ -3,6 +3,7 @@ package no.hvl.dat152.obl4.database;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.Statement;
+import java.sql.PreparedStatement;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -15,21 +16,22 @@ public class AppUserDAO {
 
     String hashedPassword = Crypto.generateMD5Hash(password);
 
-    String sql = "SELECT * FROM SecOblig.AppUser" 
-        + " WHERE username = '" + username + "'"
-        + " AND passhash = '" + hashedPassword + "'";
+    String sql = "SELECT * FROM SecOblig.AppUser WHERE username = ? AND passhash = ?";
     
     
     AppUser user = null;
 
     Connection c = null;
-    Statement s = null;
+    PreparedStatement ps = null;
     ResultSet r = null;
 
     try {        
       c = DatabaseHelper.getConnection();
-      s = c.createStatement();       
-      r = s.executeQuery(sql);
+	  ps = c.prepareStatement(sql);
+	  ps.setString(1, username);
+	  ps.setString(2, hashedPassword);
+
+      r = ps.executeQuery();
 
       if (r.next()) {
         user = new AppUser(
@@ -44,7 +46,7 @@ public class AppUserDAO {
     } catch (Exception e) {
       System.out.println(e);
     } finally {
-      DatabaseHelper.closeConnection(r, s, c);
+      DatabaseHelper.closeConnection(r, ps, c);
     }
 
     return user;
