@@ -108,7 +108,7 @@ public class JWTHandler {
 	}
 	
 	private static PublicKey loadPublicKey(String path) {
-		
+
 		PublicKey pubkey = null;
 		KeyFactory kf;
 		X509EncodedKeySpec x509spec;
@@ -118,26 +118,30 @@ public class JWTHandler {
 			byte[] publicKeyBytes = Decoders.BASE64.decode(publickey);
 			x509spec = new X509EncodedKeySpec(publicKeyBytes);
 			pubkey = kf.generatePublic(x509spec);
-		} catch(NoSuchAlgorithmException | InvalidKeySpecException e) {
-			//
+		} catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
+			System.err.println("Invalid key format.");
+		} catch (IOException e) {
+			System.err.println("Error reading the key file.");
+		} catch (Exception e) {
+			System.err.println("Unexpected error with key.");
 		}
-			
+	
 		return pubkey;
 	}
 	
-	private static String readKeys(String path) {
-
-		String line = "";
-		try (BufferedReader br = new BufferedReader(new FileReader(path))){
-			
-			line=br.readLine();			
-			
+	private static String readKeys(String path) throws IOException {
+		StringBuilder content = new StringBuilder();
+	
+		try (BufferedReader br = new BufferedReader(new FileReader(path))) {
+			String line;
+			while ((line = br.readLine()) != null) {
+				content.append(line);
+			}
 		} catch (IOException e) {
-
-			e.printStackTrace();
+			throw new IOException("Error reading the key file.");
 		}
-		
-		return line;
+	
+		return content.toString();
 	}
 	
 }
